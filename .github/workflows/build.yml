@@ -39,9 +39,11 @@ jobs:
           gradle-version: "8.5"
 
       - name: Build with Gradle
+        env:
+          BUILD_TYPE: ${{ github.event.inputs.build_type || 'debug' }}
         run: |
           export ANDROID_HOME=$ANDROID_SDK_ROOT
-          if [ "${{ github.event.inputs.build_type }}" == "release" ]; then
+          if [ "$BUILD_TYPE" == "release" ]; then
             gradle assembleRelease
           else
             gradle assembleDebug
