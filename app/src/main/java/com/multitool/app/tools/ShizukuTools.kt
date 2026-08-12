@@ -1,10 +1,8 @@
 package com.multitool.app.tools
 
-import android.os.IBinder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
-import rikka.shizuku.ShizukuBinder
 
 object ShizukuTools {
 
@@ -16,7 +14,7 @@ object ShizukuTools {
 
     fun checkStatus(): ShizukuStatus {
         val available = try {
-            Shizuku.ping()
+            Shizuku.getVersion()
             true
         } catch (e: Exception) {
             false
@@ -33,7 +31,6 @@ object ShizukuTools {
             if (!checkStatus().granted) {
                 return@withContext "Shizuku: нет разрешения"
             }
-            // Use Runtime.exec to run commands via sh
             val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
             val result = StringBuilder()
             process.inputStream.bufferedReader().use { reader ->
