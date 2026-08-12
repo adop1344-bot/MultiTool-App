@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MultiTool</string>
+    <string name="tools_title">Инструменты</string>
+    <string name="network_tools">Сетевые утилиты</string>
+    <string name="text_tools">Текстовые инструменты</string>
+    <string name="file_tools">Файловые инструменты</string>
+    <string name="converter_tools">Конвертеры</string>
+    <string name="about">О приложении</string>
+    <string name="version">Версия 1.0</string>
+    <string name="ping_title">Ping</string>
+    <string name="dns_lookup">DNS Lookup</string>
+    <string name="base64_encode">Base64 Encode</string>
+    <string name="base64_decode">Base64 Decode</string>
+    <string name="text_counter">Счётчик символов</string>
+    <string name="qr_generate">Генератор QR</string>
+</resources>
