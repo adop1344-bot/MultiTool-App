@@ -114,7 +114,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="8dp"
-                android:backgroundTint="@color/accent"
+                android:backgroundTint="@color/secondary"
                 android:text="Копировать результат"
                 android:textColor="@android:color/white" />
 
