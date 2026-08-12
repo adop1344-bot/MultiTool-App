@@ -1,9 +1,10 @@
 package com.multitool.app.tools
 
 import android.os.IBinder
-import androidx.core.content.ContextCompat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import rikka.shizuku.Shizuku
-import rikka.shizuku.ShizukuProvider
+import rikka.shizuku.ShizukuBinder
 
 object ShizukuTools {
 
@@ -23,32 +24,32 @@ object ShizukuTools {
         return ShizukuStatus(
             available = available,
             version = if (available) Shizuku.getVersion() else 0,
-            granted = if (available) Shizuku.isGranted(0) else false
+            granted = if (available) Shizuku.checkSelfPermission() == 0 else false
         )
     }
 
-    suspend fun runCommand(command: String): String = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+    suspend fun runCommand(command: String): String = withContext(Dispatchers.IO) {
         try {
             if (!checkStatus().granted) {
                 return@withContext "Shizuku: нет разрешения"
             }
+            // Use Runtime.exec to run commands via sh
+            val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", command))
             val result = StringBuilder()
-            Shizuku.newProcess(arrayOf("sh", "-c", command), null, null).let { process ->
-                process.inputStream.bufferedReader().use { reader ->
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) {
-                        result.appendLine(line)
-                    }
+            process.inputStream.bufferedReader().use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    result.appendLine(line)
                 }
-                process.errorStream.bufferedReader().use { reader ->
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) {
-                        result.appendLine("[ERR] $line")
-                    }
-                }
-                process.waitFor()
-                result.appendLine("\n--- Код выхода: ${process.exitValue()} ---")
             }
+            process.errorStream.bufferedReader().use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    result.appendLine("[ERR] $line")
+                }
+            }
+            process.waitFor()
+            result.appendLine("\n--- Код выхода: ${process.exitValue()} ---")
             result.toString()
         } catch (e: Exception) {
             "Ошибка: ${e.message}"
