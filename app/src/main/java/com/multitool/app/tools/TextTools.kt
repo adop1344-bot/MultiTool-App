@@ -19,9 +19,11 @@ object TextTools {
     data class TextStats(val chars: Int, val words: Int, val lines: Int, val spaces: Int)
 
     fun countText(text: String): TextStats {
+        val trimmed = text.trim()
+        val wordCount = if (trimmed.isEmpty()) 0 else trimmed.split(Regex("\\s+")).size
         return TextStats(
             chars = text.length,
-            words = text.trim().split("\\s+".toRegex()).let { if (it.size == 1 && it[0].isEmpty()) 0 else it.size },
+            words = wordCount,
             lines = text.lines().size,
             spaces = text.count { it == ' ' }
         )
@@ -31,12 +33,12 @@ object TextTools {
         val lower = "abcdefghijklmnopqrstuvwxyz"
         val upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         val digits = "0123456789"
-        val symbols = "!@#\$%^&*()_+-=[]{}|;':",./<>?"
+        val symbs = "!@#%^&*()_+-=[]{}|;:,.<>?"
 
         var chars = lower
         if (useUpper) chars += upper
         if (useDigits) chars += digits
-        if (useSymbols) chars += symbols
+        if (useSymbols) chars += symbs
 
         return (1..length).map { chars.random() }.joinToString("")
     }
