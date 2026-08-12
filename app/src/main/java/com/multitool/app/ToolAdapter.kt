@@ -13,7 +13,8 @@ data class ToolItem(
     val name: String,
     val description: String,
     val iconRes: Int,
-    val category: ToolCategory
+    val category: ToolCategory,
+    val toolId: String
 )
 
 class ToolAdapter(

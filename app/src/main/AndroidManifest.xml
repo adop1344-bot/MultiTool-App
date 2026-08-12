@@ -22,6 +22,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ToolActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

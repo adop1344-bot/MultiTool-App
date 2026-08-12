@@ -1,5 +1,6 @@
 package com.multitool.app
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -8,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.multitool.app.tools.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,18 +16,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ToolAdapter
 
     private val tools = listOf(
-        ToolItem("Ping", "Проверка доступности хоста", R.drawable.ic_network, ToolCategory.NETWORK),
-        ToolItem("DNS Lookup", "Поиск DNS записей", R.drawable.ic_dns, ToolCategory.NETWORK),
-        ToolItem("Base64 Encode", "Кодирование в Base64", R.drawable.ic_text, ToolCategory.TEXT),
-        ToolItem("Base64 Decode", "Декодирование из Base64", R.drawable.ic_text, ToolCategory.TEXT),
-        ToolItem("Счётчик", "Подсчёт символов/слов", R.drawable.ic_counter, ToolCategory.TEXT),
-        ToolItem("Генератор QR", "Создание QR кода", R.drawable.ic_qr, ToolCategory.CONVERTER),
-        ToolItem("Конвертер валют", "Курсы валют онлайн", R.drawable.ic_currency, ToolCategory.CONVERTER),
-        ToolItem("Генератор паролей", "Создание надёжных паролей", R.drawable.ic_password, ToolCategory.TEXT),
-        ToolItem("IP Info", "Информация об IP адресе", R.drawable.ic_network, ToolCategory.NETWORK),
-        ToolItem("Unit Converter", "Конвертация единиц", R.drawable.ic_converter, ToolCategory.CONVERTER),
-        ToolItem("WHOIS", "Информация о домене", R.drawable.ic_dns, ToolCategory.NETWORK),
-        ToolItem("Хэширование", "MD5/SHA1/SHA256", R.drawable.ic_text, ToolCategory.TEXT),
+        ToolItem("Ping", "Проверка доступности хоста", R.drawable.ic_network, ToolCategory.NETWORK, "ping"),
+        ToolItem("DNS Lookup", "Поиск DNS записей", R.drawable.ic_dns, ToolCategory.NETWORK, "dns"),
+        ToolItem("Base64 Encode", "Кодирование в Base64", R.drawable.ic_text, ToolCategory.TEXT, "b64enc"),
+        ToolItem("Base64 Decode", "Декодирование из Base64", R.drawable.ic_text, ToolCategory.TEXT, "b64dec"),
+        ToolItem("Счётчик", "Подсчёт символов/слов", R.drawable.ic_counter, ToolCategory.TEXT, "counter"),
+        ToolItem("Генератор QR", "Создание QR кода", R.drawable.ic_qr, ToolCategory.CONVERTER, "qr"),
+        ToolItem("Конвертер валют", "Курсы валют онлайн", R.drawable.ic_currency, ToolCategory.CONVERTER, "currency"),
+        ToolItem("Генератор паролей", "Создание надёжных паролей", R.drawable.ic_password, ToolCategory.TEXT, "password"),
+        ToolItem("IP Info", "Информация об IP адресе", R.drawable.ic_network, ToolCategory.NETWORK, "ipinfo"),
+        ToolItem("Unit Converter", "Конвертация единиц", R.drawable.ic_converter, ToolCategory.CONVERTER, "units"),
+        ToolItem("WHOIS", "Информация о домене", R.drawable.ic_dns, ToolCategory.NETWORK, "whois"),
+        ToolItem("Хэширование", "MD5/SHA1/SHA256", R.drawable.ic_text, ToolCategory.TEXT, "hash"),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +47,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openTool(tool: ToolItem) {
-        Toast.makeText(this, "${tool.name} — в разработке", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, ToolActivity::class.java)
+        intent.putExtra("tool_id", tool.toolId)
+        intent.putExtra("tool_name", tool.name)
+        startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
