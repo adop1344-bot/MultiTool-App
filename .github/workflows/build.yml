@@ -3,8 +3,6 @@ name: Build Android APK
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
     inputs:
       build_type:
@@ -15,6 +13,9 @@ on:
         options:
           - debug
           - release
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -38,13 +39,12 @@ jobs:
         with:
           gradle-version: "8.5"
 
-      - name: Create debug keystore if needed
+      - name: Create debug keystore
         run: |
           if [ ! -f "keystore.jks" ]; then
             keytool -genkey -v -keystore keystore.jks -alias android \
               -keyalg RSA -keysize 2048 -validity 10000 \
               -storepass android -keypass android -dname "CN=MultiTool, OU=Dev, O=MultiTool, L=City, ST=State, C=RU"
-            echo "Keystore created"
           fi
 
       - name: Build with Gradle
@@ -60,24 +60,28 @@ jobs:
             gradle assembleDebug
           fi
 
-      - name: Sign APK with debug key
+      - name: Prepare APK
         run: |
-          if [ -f "keystore.jks" ]; then
-            for apk in app/build/outputs/apk/debug/*.apk; do
-              if [ -f "$apk" ]; then
-                echo "Signing $apk..."
-                java -jar /usr/lib/android-sdk/cmdline-tools/latest/lib/apksigner.jar sign \
-                  --ks keystore.jks --ks-key-alias android \
-                  --ks-pass pass:android --key-pass pass:android \
-                  "$apk" 2>/dev/null || true
-              fi
-            done
-          fi
+          mkdir -p release-apk
+          find app/build/outputs/apk -name "*.apk" -exec cp {} release-apk/ \;
+          ls -la release-apk/
 
-      - name: Upload APK artifacts
-        uses: actions/upload-artifact@v4
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: MultiTool-APK
-          path: |
-            app/build/outputs/apk/**/*.apk
-          if-no-files-found: warn
+          tag_name: v1.0.${{ github.run_number }}
+          name: "MultiTool v1.0.${{ github.run_number }}"
+          body: |
+            ## MultiTool v1.0.${{ github.run_number }}
+
+            ### 25+ инструментов:
+            🌐 **Сеть**: Ping, DNS, IP Info, Port Check, HTTP Check
+            📝 **Текст**: Base64, URL, JSON, UUID, ROT13, Lorem Ipsum, Reverse
+            🔄 **Конвертеры**: Color, Temperature, Length, Weight, Data
+            🔑 **Shizuku**: Shell Console, System Info
+            🔐 **Крипто**: MD5, SHA-1, SHA-256
+
+            📥 Скачай APK ниже
+          files: release-apk/*
+          generate_release_notes: false
+          make_latest: true

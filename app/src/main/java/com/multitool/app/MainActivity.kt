@@ -16,21 +16,37 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: ToolAdapter
 
     private val tools = listOf(
+        // Network
         ToolItem("Ping", "Проверка доступности хоста", R.drawable.ic_network, ToolCategory.NETWORK, "ping"),
         ToolItem("DNS Lookup", "Поиск DNS записей", R.drawable.ic_dns, ToolCategory.NETWORK, "dns"),
+        ToolItem("IP Info", "Информация об IP адресе", R.drawable.ic_network, ToolCategory.NETWORK, "ipinfo"),
+        ToolItem("Port Check", "Проверка открытых портов", R.drawable.ic_network, ToolCategory.NETWORK, "portcheck"),
+        ToolItem("HTTP Check", "Проверка HTTP заголовков", R.drawable.ic_network, ToolCategory.NETWORK, "httpcheck"),
+
+        // Text
         ToolItem("Base64 Encode", "Кодирование в Base64", R.drawable.ic_text, ToolCategory.TEXT, "b64enc"),
         ToolItem("Base64 Decode", "Декодирование из Base64", R.drawable.ic_text, ToolCategory.TEXT, "b64dec"),
+        ToolItem("URL Encode", "Кодирование URL", R.drawable.ic_text, ToolCategory.TEXT, "urlenc"),
+        ToolItem("URL Decode", "Декодирование URL", R.drawable.ic_text, ToolCategory.TEXT, "urldec"),
         ToolItem("Счётчик", "Подсчёт символов/слов", R.drawable.ic_counter, ToolCategory.TEXT, "counter"),
-        ToolItem("Генератор QR", "Создание QR кода", R.drawable.ic_qr, ToolCategory.CONVERTER, "qr"),
-        ToolItem("Конвертер валют", "Курсы валют онлайн", R.drawable.ic_currency, ToolCategory.CONVERTER, "currency"),
         ToolItem("Генератор паролей", "Создание надёжных паролей", R.drawable.ic_password, ToolCategory.TEXT, "password"),
-        ToolItem("IP Info", "Информация об IP адресе", R.drawable.ic_network, ToolCategory.NETWORK, "ipinfo"),
-        ToolItem("Unit Converter", "Конвертация единиц", R.drawable.ic_converter, ToolCategory.CONVERTER, "units"),
-        ToolItem("WHOIS", "Информация о домене", R.drawable.ic_dns, ToolCategory.NETWORK, "whois"),
         ToolItem("Хэширование", "MD5/SHA1/SHA256", R.drawable.ic_text, ToolCategory.TEXT, "hash"),
-        // Shizuku tools
-        ToolItem("Shizuku Console", "Выполнение команд через Shizuku", R.drawable.ic_password, ToolCategory.TEXT, "shizuku"),
-        ToolItem("Shizuku System", "Инфо о системе через Shizuku", R.drawable.ic_converter, ToolCategory.TEXT, "shizuku_sys"),
+        ToolItem("UUID", "Генератор UUID", R.drawable.ic_text, ToolCategory.TEXT, "uuid"),
+        ToolItem("Lorem Ipsum", "Генератор текста", R.drawable.ic_text, ToolCategory.TEXT, "lorem"),
+        ToolItem("JSON Format", "Форматирование JSON", R.drawable.ic_text, ToolCategory.TEXT, "jsonfmt"),
+        ToolItem("ROT13", "Шифр ROT13", R.drawable.ic_text, ToolCategory.TEXT, "rot13"),
+        ToolItem("Reverse Text", "Переворот текста", R.drawable.ic_text, ToolCategory.TEXT, "reverse"),
+
+        // Converter
+        ToolItem("Color Converter", "HEX/RGB/HSL", R.drawable.ic_converter, ToolCategory.CONVERTER, "color"),
+        ToolItem("Temperature", "Конвертер температуры", R.drawable.ic_converter, ToolCategory.CONVERTER, "temp"),
+        ToolItem("Length", "Конвертер длины", R.drawable.ic_converter, ToolCategory.CONVERTER, "length"),
+        ToolItem("Weight", "Конвертер веса", R.drawable.ic_converter, ToolCategory.CONVERTER, "weight"),
+        ToolItem("Data Size", "Конвертер данных", R.drawable.ic_converter, ToolCategory.CONVERTER, "data"),
+
+        // Shizuku
+        ToolItem("Shizuku Console", "Команды через Shizuku", R.drawable.ic_password, ToolCategory.TEXT, "shizuku"),
+        ToolItem("Shizuku System", "Инфо о системе", R.drawable.ic_converter, ToolCategory.TEXT, "shizuku_sys"),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,8 +80,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_about -> {
-                val ver = "${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"
-                Toast.makeText(this, "$app_name $ver", Toast.LENGTH_LONG).show()
+                val ver = "v${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"
+                Toast.makeText(this, "MultiTool $ver", Toast.LENGTH_LONG).show()
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -14,6 +14,8 @@ class ToolActivity : AppCompatActivity() {
     private lateinit var statusText: TextView
     private lateinit var inputField: EditText
     private lateinit var inputField2: EditText
+    private lateinit var inputLayout: com.google.android.material.textfield.TextInputLayout
+    private lateinit var inputLayout2: com.google.android.material.textfield.TextInputLayout
     private lateinit var resultText: TextView
     private lateinit var actionBtn: Button
     private lateinit var copyBtn: Button
@@ -34,6 +36,8 @@ class ToolActivity : AppCompatActivity() {
         statusText = findViewById(R.id.statusText)
         inputField = findViewById(R.id.inputField)
         inputField2 = findViewById(R.id.inputField2)
+        inputLayout = findViewById(R.id.inputLayout)
+        inputLayout2 = findViewById(R.id.inputLayout2)
         resultText = findViewById(R.id.resultText)
         actionBtn = findViewById(R.id.actionBtn)
         copyBtn = findViewById(R.id.copyBtn)
@@ -50,8 +54,9 @@ class ToolActivity : AppCompatActivity() {
 
     private fun setupTool() {
         when (toolId) {
+            // === NETWORK ===
             "ping" -> {
-                inputField.hint = "Введите хост (например, google.com)"
+                inputField.hint = "Хост (google.com)"
                 inputField2.visibility = android.view.View.GONE
                 actionBtn.text = "Ping"
                 actionBtn.setOnClickListener {
@@ -66,7 +71,7 @@ class ToolActivity : AppCompatActivity() {
                 }
             }
             "dns" -> {
-                inputField.hint = "Введите домен (например, google.com)"
+                inputField.hint = "Домен (google.com)"
                 inputField2.visibility = android.view.View.GONE
                 actionBtn.text = "DNS Lookup"
                 actionBtn.setOnClickListener {
@@ -80,8 +85,54 @@ class ToolActivity : AppCompatActivity() {
                     }
                 }
             }
+            "ipinfo" -> {
+                inputField.hint = "IP (пусто = ваш IP)"
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "Узнать"
+                actionBtn.setOnClickListener {
+                    val ip = inputField.text.toString().trim()
+                    statusText.text = "Получаю..."
+                    resultText.text = ""
+                    CoroutineScope(Dispatchers.Main).launch {
+                        resultText.text = NetworkTools.getIpInfo(ip)
+                        statusText.text = "Готово"
+                    }
+                }
+            }
+            "portcheck" -> {
+                inputField.hint = "Хост (192.168.1.1)"
+                inputField2.hint = "Порт (80)"
+                actionBtn.text = "Проверить"
+                actionBtn.setOnClickListener {
+                    val host = inputField.text.toString().trim()
+                    val port = inputField2.text.toString().toIntOrNull()
+                    if (host.isEmpty() || port == null) { Toast.makeText(this, "Введите хост и порт", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                    statusText.text = "Проверяю..."
+                    resultText.text = ""
+                    CoroutineScope(Dispatchers.Main).launch {
+                        resultText.text = NetworkTools.checkPort(host, port)
+                        statusText.text = "Готово"
+                    }
+                }
+            }
+            "httpcheck" -> {
+                inputField.hint = "URL (google.com)"
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "Проверить"
+                actionBtn.setOnClickListener {
+                    val url = inputField.text.toString().trim()
+                    if (url.isEmpty()) { Toast.makeText(this, "Введите URL", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                    statusText.text = "Проверяю..."
+                    resultText.text = ""
+                    CoroutineScope(Dispatchers.Main).launch {
+                        resultText.text = NetworkTools.httpCheck(url)
+                        statusText.text = "Готово"
+                    }
+                }
+            }
+            // === TEXT ===
             "b64enc" -> {
-                inputField.hint = "Введите текст для кодирования"
+                inputField.hint = "Текст для кодирования"
                 inputField2.visibility = android.view.View.GONE
                 actionBtn.text = "Encode"
                 actionBtn.setOnClickListener {
@@ -92,13 +143,31 @@ class ToolActivity : AppCompatActivity() {
                 }
             }
             "b64dec" -> {
-                inputField.hint = "Введите Base64 строку"
+                inputField.hint = "Base64 строка"
                 inputField2.visibility = android.view.View.GONE
                 actionBtn.text = "Decode"
                 actionBtn.setOnClickListener {
                     val text = inputField.text.toString().trim()
                     if (text.isEmpty()) { Toast.makeText(this, "Введите Base64", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
                     resultText.text = TextTools.base64Decode(text)
+                    statusText.text = "Готово"
+                }
+            }
+            "urlenc" -> {
+                inputField.hint = "Текст для кодирования"
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "URL Encode"
+                actionBtn.setOnClickListener {
+                    resultText.text = TextTools.urlEncode(inputField.text.toString())
+                    statusText.text = "Готово"
+                }
+            }
+            "urldec" -> {
+                inputField.hint = "URL для декодирования"
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "URL Decode"
+                actionBtn.setOnClickListener {
+                    resultText.text = TextTools.urlDecode(inputField.text.toString().trim())
                     statusText.text = "Готово"
                 }
             }
@@ -114,6 +183,8 @@ class ToolActivity : AppCompatActivity() {
                         Слов: ${stats.words}
                         Строк: ${stats.lines}
                         Пробелов: ${stats.spaces}
+                        Цифр: ${stats.digits}
+                        Букв: ${stats.letters}
                     """.trimIndent()
                     statusText.text = "Готово"
                 }
@@ -126,20 +197,6 @@ class ToolActivity : AppCompatActivity() {
                     val len = inputField.text.toString().toIntOrNull() ?: 16
                     resultText.text = TextTools.generatePassword(len.coerceIn(4, 64))
                     statusText.text = "Готово"
-                }
-            }
-            "ipinfo" -> {
-                inputField.hint = "Введите IP (или оставьте пустым для своего)"
-                inputField2.visibility = android.view.View.GONE
-                actionBtn.text = "Узнать IP"
-                actionBtn.setOnClickListener {
-                    val ip = inputField.text.toString().trim()
-                    statusText.text = "Получаю информацию..."
-                    resultText.text = ""
-                    CoroutineScope(Dispatchers.Main).launch {
-                        resultText.text = NetworkTools.getIpInfo(if (ip.isEmpty()) "" else ip)
-                        statusText.text = "Готово"
-                    }
                 }
             }
             "hash" -> {
@@ -157,22 +214,137 @@ class ToolActivity : AppCompatActivity() {
                     statusText.text = "Готово"
                 }
             }
+            "uuid" -> {
+                inputField.visibility = android.view.View.GONE
+                inputLayout.visibility = android.view.View.GONE
+                inputField2.visibility = android.view.View.GONE
+                inputLayout2.visibility = android.view.View.GONE
+                actionBtn.text = "Сгенерировать UUID"
+                actionBtn.setOnClickListener {
+                    resultText.text = """
+                        UUID: ${TextTools.generateUUID()}
+                        Short: ${TextTools.generateShortUUID()}
+                    """.trimIndent()
+                    statusText.text = "Готово"
+                }
+            }
+            "lorem" -> {
+                inputField.hint = "Количество слов (50)"
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "Сгенерировать"
+                actionBtn.setOnClickListener {
+                    val count = inputField.text.toString().toIntOrNull() ?: 50
+                    resultText.text = TextTools.loremIpsum(count.coerceIn(5, 500))
+                    statusText.text = "Готово"
+                }
+            }
+            "jsonfmt" -> {
+                inputField.hint = "Введите JSON строку"
+                inputField2.visibility = android.view.View.GONE
+                inputField.setLines(5)
+                actionBtn.text = "Форматировать"
+                actionBtn.setOnClickListener {
+                    val json = inputField.text.toString().trim()
+                    if (json.isEmpty()) { Toast.makeText(this, "Введите JSON", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                    resultText.text = TextTools.jsonPrettify(json)
+                    statusText.text = "Готово"
+                }
+            }
+            "rot13" -> {
+                inputField.hint = "Текст для ROT13"
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "Преобразовать"
+                actionBtn.setOnClickListener {
+                    resultText.text = TextTools.rot13(inputField.text.toString())
+                    statusText.text = "Готово"
+                }
+            }
+            "reverse" -> {
+                inputField.hint = "Текст для переворота"
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "Перевернуть"
+                actionBtn.setOnClickListener {
+                    resultText.text = TextTools.reverseText(inputField.text.toString())
+                    statusText.text = "Готово"
+                }
+            }
+            // === CONVERTERS ===
+            "color" -> {
+                inputField.hint = "HEX (#FF0000) или RGB (255,0,0)"
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "Конвертировать"
+                actionBtn.setOnClickListener {
+                    val text = inputField.text.toString().trim()
+                    if (text.isEmpty()) { Toast.makeText(this, "Введите цвет", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                    val rgb = ConverterTools.hexToRgb(text.removePrefix("#"))
+                    if (rgb != null) {
+                        val hsl = ConverterTools.rgbToHsl(rgb.r, rgb.g, rgb.b)
+                        resultText.text = """
+                            HEX: ${ConverterTools.rgbToHex(rgb.r, rgb.g, rgb.b)}
+                            RGB: ${rgb.r}, ${rgb.g}, ${rgb.b}
+                            HSL: ${"%.1f".format(hsl.first)}°, ${"%.1f".format(hsl.second)}%, ${"%.1f".format(hsl.third)}%
+                        """.trimIndent()
+                        statusText.text = "Готово"
+                    } else {
+                        resultText.text = "Неверный формат цвета"
+                    }
+                }
+            }
+            "temp" -> {
+                inputField.hint = "Значение (25)"
+                inputField2.hint = "Из (C/F/K) -> В (C/F/K)"
+                actionBtn.text = "Конвертировать"
+                actionBtn.setOnClickListener {
+                    val value = inputField.text.toString().toDoubleOrNull()
+                    val parts = inputField2.text.toString().trim().split("->", ">", " ")
+                    if (value == null || parts.size < 2) {
+                        Toast.makeText(this, "Введите: значение и C->F", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    resultText.text = ConverterTools.convertTemp(value, parts[0].trim().uppercase().take(1), parts[1].trim().uppercase().take(1))
+                    statusText.text = "Готово"
+                }
+            }
+            "length", "weight", "data" -> {
+                val units = when (toolId) {
+                    "length" -> ConverterTools.lengthUnits
+                    "weight" -> ConverterTools.weightUnits
+                    else -> ConverterTools.dataUnits
+                }
+                val unitNames = units.joinToString(", ") { it.symbol }
+                inputField.hint = "Значение"
+                inputField2.hint = "Из -> В (например: m->cm)"
+                actionBtn.text = "Конвертировать"
+                actionBtn.setOnClickListener {
+                    val value = inputField.text.toString().toDoubleOrNull()
+                    val parts = inputField2.text.toString().trim().split("->", ">", " ")
+                    if (value == null || parts.size < 2) {
+                        Toast.makeText(this, "Формат: значение из->в", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    val from = units.find { it.symbol == parts[0].trim() || it.name == parts[0].trim() }
+                    val to = units.find { it.symbol == parts[1].trim() || it.name == parts[1].trim() }
+                    if (from == null || to == null) {
+                        resultText.text = "Неверные единицы. Доступны: $unitNames"
+                        return@setOnClickListener
+                    }
+                    resultText.text = ConverterTools.convert(value, from, to)
+                    statusText.text = "Готово"
+                }
+            }
+            // === SHIZUKU ===
             "shizuku" -> {
-                inputField.hint = "Введите команду (например: pm list packages)"
+                inputField.hint = "Команда (pm list packages)"
                 inputField2.visibility = android.view.View.GONE
                 actionBtn.text = "Выполнить"
-                statusText.text = "Проверка Shizuku..."
                 ShizukuTools.checkStatus().let { st ->
-                    statusText.text = if (st.available) "Shizuku OK, v${st.version}" else "Shizuku не запущен"
+                    statusText.text = if (st.available) "Shizuku v${st.version} ${if(st.granted) "✓" else "✗ нет прав"}" else "Shizuku не запущен"
                 }
                 actionBtn.setOnClickListener {
                     val cmd = inputField.text.toString().trim()
                     if (cmd.isEmpty()) { Toast.makeText(this, "Введите команду", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
                     val st = ShizukuTools.checkStatus()
-                    if (!st.granted) {
-                        Toast.makeText(this, "Нет разрешения Shizuku", Toast.LENGTH_LONG).show()
-                        return@setOnClickListener
-                    }
+                    if (!st.granted) { Toast.makeText(this, "Нет разрешения Shizuku", Toast.LENGTH_LONG).show(); return@setOnClickListener }
                     statusText.text = "Выполняю..."
                     resultText.text = ""
                     CoroutineScope(Dispatchers.Main).launch {
@@ -183,30 +355,25 @@ class ToolActivity : AppCompatActivity() {
             }
             "shizuku_sys" -> {
                 inputField.visibility = android.view.View.GONE
+                inputLayout.visibility = android.view.View.GONE
                 inputField2.visibility = android.view.View.GONE
-                actionBtn.text = "Получить инфо"
+                inputLayout2.visibility = android.view.View.GONE
+                actionBtn.text = "Инфо о системе"
                 actionBtn.setOnClickListener {
                     val st = ShizukuTools.checkStatus()
-                    if (!st.granted) {
-                        Toast.makeText(this, "Нет разрешения Shizuku", Toast.LENGTH_LONG).show()
-                        return@setOnClickListener
-                    }
-                    statusText.text = "Собираю информацию..."
+                    if (!st.granted) { Toast.makeText(this, "Нет разрешения Shizuku", Toast.LENGTH_LONG).show(); return@setOnClickListener }
+                    statusText.text = "Собираю..."
                     resultText.text = ""
                     CoroutineScope(Dispatchers.Main).launch {
-                        resultText.text = ShizukuTools.runCommand("uname -a\ncat /proc/cpuinfo | head -10\nfree -h\ncat /proc/meminfo | head -5\ndf -h /data | tail -1")
+                        resultText.text = ShizukuTools.runCommand(
+                            "echo '=== Устройство ===' && uname -a && echo '' && " +
+                            "echo '=== CPU ===' && cat /proc/cpuinfo | grep -E 'model name|Hardware|Processor' | head -5 && echo '' && " +
+                            "echo '=== Память ===' && free -h && echo '' && " +
+                            "echo '=== Разделы ===' && df -h /data /system 2>/dev/null && echo '' && " +
+                            "echo '=== Android ===' && getprop ro.build.version.release && getprop ro.build.version.sdk"
+                        )
                         statusText.text = "Готово"
                     }
-                }
-            }
-            "qr", "currency", "whois", "units" -> {
-                inputField.visibility = android.view.View.GONE
-                inputField2.visibility = android.view.View.GONE
-                actionBtn.text = "Понятно"
-                statusText.text = "В разработке"
-                resultText.text = "Этот инструмент будет добавлен в следующей версии приложения."
-                actionBtn.setOnClickListener {
-                    finish()
                 }
             }
         }
