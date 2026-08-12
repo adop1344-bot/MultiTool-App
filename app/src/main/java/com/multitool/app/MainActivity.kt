@@ -19,34 +19,41 @@ class MainActivity : AppCompatActivity() {
         // Network
         ToolItem("Ping", "Проверка доступности хоста", R.drawable.ic_network, ToolCategory.NETWORK, "ping"),
         ToolItem("DNS Lookup", "Поиск DNS записей", R.drawable.ic_dns, ToolCategory.NETWORK, "dns"),
-        ToolItem("IP Info", "Информация об IP адресе", R.drawable.ic_network, ToolCategory.NETWORK, "ipinfo"),
-        ToolItem("Port Check", "Проверка открытых портов", R.drawable.ic_network, ToolCategory.NETWORK, "portcheck"),
-        ToolItem("HTTP Check", "Проверка HTTP заголовков", R.drawable.ic_network, ToolCategory.NETWORK, "httpcheck"),
+        ToolItem("IP Info", "Информация об IP", R.drawable.ic_network, ToolCategory.NETWORK, "ipinfo"),
+        ToolItem("Port Check", "Проверка портов", R.drawable.ic_network, ToolCategory.NETWORK, "portcheck"),
+        ToolItem("HTTP Check", "HTTP заголовки", R.drawable.ic_network, ToolCategory.NETWORK, "httpcheck"),
 
         // Text
-        ToolItem("Base64 Encode", "Кодирование в Base64", R.drawable.ic_text, ToolCategory.TEXT, "b64enc"),
-        ToolItem("Base64 Decode", "Декодирование из Base64", R.drawable.ic_text, ToolCategory.TEXT, "b64dec"),
+        ToolItem("Base64 Encode", "Кодирование", R.drawable.ic_text, ToolCategory.TEXT, "b64enc"),
+        ToolItem("Base64 Decode", "Декодирование", R.drawable.ic_text, ToolCategory.TEXT, "b64dec"),
         ToolItem("URL Encode", "Кодирование URL", R.drawable.ic_text, ToolCategory.TEXT, "urlenc"),
         ToolItem("URL Decode", "Декодирование URL", R.drawable.ic_text, ToolCategory.TEXT, "urldec"),
-        ToolItem("Счётчик", "Подсчёт символов/слов", R.drawable.ic_counter, ToolCategory.TEXT, "counter"),
-        ToolItem("Генератор паролей", "Создание надёжных паролей", R.drawable.ic_password, ToolCategory.TEXT, "password"),
-        ToolItem("Хэширование", "MD5/SHA1/SHA256", R.drawable.ic_text, ToolCategory.TEXT, "hash"),
+        ToolItem("Счётчик", "Символы/слова", R.drawable.ic_counter, ToolCategory.TEXT, "counter"),
+        ToolItem("Пароли", "Генератор паролей", R.drawable.ic_password, ToolCategory.TEXT, "password"),
+        ToolItem("Хэши", "MD5/SHA1/SHA256", R.drawable.ic_text, ToolCategory.TEXT, "hash"),
         ToolItem("UUID", "Генератор UUID", R.drawable.ic_text, ToolCategory.TEXT, "uuid"),
         ToolItem("Lorem Ipsum", "Генератор текста", R.drawable.ic_text, ToolCategory.TEXT, "lorem"),
-        ToolItem("JSON Format", "Форматирование JSON", R.drawable.ic_text, ToolCategory.TEXT, "jsonfmt"),
+        ToolItem("JSON Format", "Форматирование", R.drawable.ic_text, ToolCategory.TEXT, "jsonfmt"),
         ToolItem("ROT13", "Шифр ROT13", R.drawable.ic_text, ToolCategory.TEXT, "rot13"),
-        ToolItem("Reverse Text", "Переворот текста", R.drawable.ic_text, ToolCategory.TEXT, "reverse"),
+        ToolItem("Reverse", "Переворот текста", R.drawable.ic_text, ToolCategory.TEXT, "reverse"),
 
-        // Converter
-        ToolItem("Color Converter", "HEX/RGB/HSL", R.drawable.ic_converter, ToolCategory.CONVERTER, "color"),
-        ToolItem("Temperature", "Конвертер температуры", R.drawable.ic_converter, ToolCategory.CONVERTER, "temp"),
+        // Converters
+        ToolItem("Color", "HEX/RGB/HSL", R.drawable.ic_converter, ToolCategory.CONVERTER, "color"),
+        ToolItem("Temperature", "Конвертер C/F/K", R.drawable.ic_converter, ToolCategory.CONVERTER, "temp"),
         ToolItem("Length", "Конвертер длины", R.drawable.ic_converter, ToolCategory.CONVERTER, "length"),
         ToolItem("Weight", "Конвертер веса", R.drawable.ic_converter, ToolCategory.CONVERTER, "weight"),
         ToolItem("Data Size", "Конвертер данных", R.drawable.ic_converter, ToolCategory.CONVERTER, "data"),
 
         // Shizuku
-        ToolItem("Shizuku Console", "Команды через Shizuku", R.drawable.ic_password, ToolCategory.TEXT, "shizuku"),
+        ToolItem("Shizuku Console", "Выполнить команду", R.drawable.ic_password, ToolCategory.TEXT, "shizuku"),
         ToolItem("Shizuku System", "Инфо о системе", R.drawable.ic_converter, ToolCategory.TEXT, "shizuku_sys"),
+        ToolItem("Shizuku Packages", "Список пакетов", R.drawable.ic_text, ToolCategory.TEXT, "shizuku_pkg"),
+        ToolItem("Shizuku Processes", "Запущенные процессы", R.drawable.ic_network, ToolCategory.TEXT, "shizuku_proc"),
+        ToolItem("Shizuku Storage", "Инфо о хранилище", R.drawable.ic_converter, ToolCategory.TEXT, "shizuku_storage"),
+        ToolItem("Shizuku WiFi", "Инфо о WiFi", R.drawable.ic_network, ToolCategory.TEXT, "shizuku_wifi"),
+        ToolItem("Shizuku Battery", "Инфо о батарее", R.drawable.ic_converter, ToolCategory.TEXT, "shizuku_bat"),
+        ToolItem("Shizuku Cache", "Очистка кэша", R.drawable.ic_counter, ToolCategory.TEXT, "shizuku_cache"),
+        ToolItem("Shizuku Props", "Свойства системы", R.drawable.ic_converter, ToolCategory.TEXT, "shizuku_props"),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_about -> {
                 val ver = "v${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"
-                Toast.makeText(this, "MultiTool $ver", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "MultiTool $ver\n🔥 30+ инструментов", Toast.LENGTH_LONG).show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
