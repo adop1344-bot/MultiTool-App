@@ -38,15 +38,40 @@ jobs:
         with:
           gradle-version: "8.5"
 
+      - name: Create debug keystore if needed
+        run: |
+          if [ ! -f "keystore.jks" ]; then
+            keytool -genkey -v -keystore keystore.jks -alias android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass android -keypass android -dname "CN=MultiTool, OU=Dev, O=MultiTool, L=City, ST=State, C=RU"
+            echo "Keystore created"
+          fi
+
       - name: Build with Gradle
         env:
           BUILD_TYPE: ${{ github.event.inputs.build_type || 'debug' }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
           export ANDROID_HOME=$ANDROID_SDK_ROOT
+          export GITHUB_RUN_NUMBER=${{ github.run_number }}
           if [ "$BUILD_TYPE" == "release" ]; then
             gradle assembleRelease
           else
             gradle assembleDebug
+          fi
+
+      - name: Sign APK with debug key
+        run: |
+          if [ -f "keystore.jks" ]; then
+            for apk in app/build/outputs/apk/debug/*.apk; do
+              if [ -f "$apk" ]; then
+                echo "Signing $apk..."
+                java -jar /usr/lib/android-sdk/cmdline-tools/latest/lib/apksigner.jar sign \
+                  --ks keystore.jks --ks-key-alias android \
+                  --ks-pass pass:android --key-pass pass:android \
+                  "$apk" 2>/dev/null || true
+              fi
+            done
           fi
 
       - name: Upload APK artifacts

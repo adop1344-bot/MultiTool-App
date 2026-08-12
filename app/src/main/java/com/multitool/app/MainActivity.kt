@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity() {
         ToolItem("Unit Converter", "Конвертация единиц", R.drawable.ic_converter, ToolCategory.CONVERTER, "units"),
         ToolItem("WHOIS", "Информация о домене", R.drawable.ic_dns, ToolCategory.NETWORK, "whois"),
         ToolItem("Хэширование", "MD5/SHA1/SHA256", R.drawable.ic_text, ToolCategory.TEXT, "hash"),
+        // Shizuku tools
+        ToolItem("Shizuku Console", "Выполнение команд через Shizuku", R.drawable.ic_password, ToolCategory.TEXT, "shizuku"),
+        ToolItem("Shizuku System", "Инфо о системе через Shizuku", R.drawable.ic_converter, ToolCategory.TEXT, "shizuku_sys"),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +64,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_about -> {
-                Toast.makeText(this, "${getString(R.string.app_name)} ${getString(R.string.version)}", Toast.LENGTH_LONG).show()
+                val ver = "${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE})"
+                Toast.makeText(this, "$app_name $ver", Toast.LENGTH_LONG).show()
                 true
             }
             else -> super.onOptionsItemSelected(item)

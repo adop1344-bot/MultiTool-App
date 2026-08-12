@@ -1,5 +1,7 @@
 package com.multitool.app
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -39,8 +41,8 @@ class ToolActivity : AppCompatActivity() {
         setupTool()
 
         copyBtn.setOnClickListener {
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("result", resultText.text)
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("result", resultText.text)
             clipboard.setPrimaryClip(clip)
             Toast.makeText(this, "Скопировано!", Toast.LENGTH_SHORT).show()
         }
@@ -147,11 +149,6 @@ class ToolActivity : AppCompatActivity() {
                 actionBtn.setOnClickListener {
                     val text = inputField.text.toString()
                     if (text.isEmpty()) { Toast.makeText(this, "Введите текст", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
-                    val algo = when (inputField2.text.toString().trim().uppercase()) {
-                        "SHA1", "SHA-1" -> "SHA-1"
-                        "SHA256", "SHA-256" -> "SHA-256"
-                        else -> "MD5"
-                    }
                     resultText.text = """
                         MD5: ${TextTools.hash(text, "MD5")}
                         SHA-1: ${TextTools.hash(text, "SHA-1")}
@@ -160,36 +157,56 @@ class ToolActivity : AppCompatActivity() {
                     statusText.text = "Готово"
                 }
             }
-            "qr" -> {
-                inputField.hint = "Введите текст или URL"
+            "shizuku" -> {
+                inputField.hint = "Введите команду (например: pm list packages)"
                 inputField2.visibility = android.view.View.GONE
-                actionBtn.text = "Создать QR"
+                actionBtn.text = "Выполнить"
+                statusText.text = "Проверка Shizuku..."
+                ShizukuTools.checkStatus().let { st ->
+                    statusText.text = if (st.available) "Shizuku OK, v${st.version}" else "Shizuku не запущен"
+                }
                 actionBtn.setOnClickListener {
-                    Toast.makeText(this, "QR генератор будет добавлен в следующей версии", Toast.LENGTH_SHORT).show()
+                    val cmd = inputField.text.toString().trim()
+                    if (cmd.isEmpty()) { Toast.makeText(this, "Введите команду", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+                    val st = ShizukuTools.checkStatus()
+                    if (!st.granted) {
+                        Toast.makeText(this, "Нет разрешения Shizuku", Toast.LENGTH_LONG).show()
+                        return@setOnClickListener
+                    }
+                    statusText.text = "Выполняю..."
+                    resultText.text = ""
+                    CoroutineScope(Dispatchers.Main).launch {
+                        resultText.text = ShizukuTools.runCommand(cmd)
+                        statusText.text = "Готово"
+                    }
                 }
             }
-            "currency" -> {
-                inputField.hint = "Сумма"
-                inputField2.hint = "USD -> RUB"
-                actionBtn.text = "Конвертировать"
-                actionBtn.setOnClickListener {
-                    Toast.makeText(this, "Конвертер валют будет добавлен в следующей версии", Toast.LENGTH_SHORT).show()
-                }
-            }
-            "whois" -> {
-                inputField.hint = "Введите домен"
+            "shizuku_sys" -> {
+                inputField.visibility = android.view.View.GONE
                 inputField2.visibility = android.view.View.GONE
-                actionBtn.text = "WHOIS"
+                actionBtn.text = "Получить инфо"
                 actionBtn.setOnClickListener {
-                    Toast.makeText(this, "WHOIS будет добавлен в следующей версии", Toast.LENGTH_SHORT).show()
+                    val st = ShizukuTools.checkStatus()
+                    if (!st.granted) {
+                        Toast.makeText(this, "Нет разрешения Shizuku", Toast.LENGTH_LONG).show()
+                        return@setOnClickListener
+                    }
+                    statusText.text = "Собираю информацию..."
+                    resultText.text = ""
+                    CoroutineScope(Dispatchers.Main).launch {
+                        resultText.text = ShizukuTools.runCommand("uname -a\ncat /proc/cpuinfo | head -10\nfree -h\ncat /proc/meminfo | head -5\ndf -h /data | tail -1")
+                        statusText.text = "Готово"
+                    }
                 }
             }
-            "units" -> {
-                inputField.hint = "Введите значение"
-                inputField2.hint = "Единицы (cm->m, kg->g)"
-                actionBtn.text = "Конвертировать"
+            "qr", "currency", "whois", "units" -> {
+                inputField.visibility = android.view.View.GONE
+                inputField2.visibility = android.view.View.GONE
+                actionBtn.text = "Понятно"
+                statusText.text = "В разработке"
+                resultText.text = "Этот инструмент будет добавлен в следующей версии приложения."
                 actionBtn.setOnClickListener {
-                    Toast.makeText(this, "Unit Converter будет добавлен в следующей версии", Toast.LENGTH_SHORT).show()
+                    finish()
                 }
             }
         }
