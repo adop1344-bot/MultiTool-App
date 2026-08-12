@@ -72,19 +72,19 @@ object ConverterTools {
     fun rgbToHex(r: Int, g: Int, b: Int): String = "#%02X%02X%02X".format(r.coerceIn(0, 255), g.coerceIn(0, 255), b.coerceIn(0, 255))
 
     fun rgbToHsl(r: Int, g: Int, b: Int): Triple<Double, Double, Double> {
-        val rf = r / 255f; val gf = g / 255f; val bf = b / 255f
-        val max = maxOf(rf, gf, bf); val min = minOf(rf, gf, bf)
-        val l = (max + min) / 2
+        val rd = r / 255.0; val gd = g / 255.0; val bd = b / 255.0
+        val max = maxOf(rd, gd, bd); val min = minOf(rd, gd, bd)
+        val l = (max + min) / 2.0
         val s = if (max == min) 0.0 else {
             val d = max - min
-            if (l > 0.5) d / (2 - max - min) else d / (max + min)
+            if (l > 0.5) d / (2.0 - max - min) else d / (max + min)
         }
         val h = when {
             max == min -> 0.0
-            max == rf -> (60 * ((gf - bf) / (max - min)) + 360) % 360
-            max == gf -> 60 * ((bf - rf) / (max - min)) + 120
-            else -> 60 * ((rf - gf) / (max - min)) + 240
+            max == rd -> (60.0 * ((gd - bd) / (max - min)) + 360.0) % 360.0
+            max == gd -> 60.0 * ((bd - rd) / (max - min)) + 120.0
+            else -> 60.0 * ((rd - gd) / (max - min)) + 240.0
         }
-        return Triple(h, s * 100, l * 100)
+        return Triple(h, s * 100.0, l * 100.0)
     }
 }
