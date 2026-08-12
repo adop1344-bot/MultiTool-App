@@ -30,46 +30,27 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+        with:
+          gradle-version: "8.5"
 
       - name: Build with Gradle
         run: |
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
           if [ "${{ github.event.inputs.build_type }}" == "release" ]; then
-            ./gradlew assembleRelease
+            gradle assembleRelease
           else
-            ./gradlew assembleDebug
+            gradle assembleDebug
           fi
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: MultiTool-APK-${{ github.event.inputs.build_type || 'debug' }}
+          name: MultiTool-APK
           path: |
-            app/build/outputs/apk/debug/*.apk
-            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/**/*.apk
           if-no-files-found: warn
-
-      - name: Create Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: build-${{ github.run_number }}
-          name: "Сборка #${{ github.run_number }}"
-          body: |
-            ## MultiTool-App
-            Автоматическая сборка #${{ github.run_number }}
-            
-            **Коммит:** ${{ github.sha }}
-            **Время:** ${{ github.event.head_commit.timestamp || 'now' }}
-            
-            ### Установка
-            Скачай APK из артефактов сборки выше ☝️
-          files: |
-            app/build/outputs/apk/debug/*.apk
-            app/build/outputs/apk/release/*.apk
-          generate_release_notes: false
-          make_latest: true
